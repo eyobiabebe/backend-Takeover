@@ -10,7 +10,7 @@ let io: Server | undefined;
 export const initSocket = (server: HttpServer) => {
   io = new Server(server, {
     cors: {
-      origin: ["http://localhost:5173", "http://localhost:19006"], // update with your frontend origins
+      origin: ["https://www.takeovermobile.com", "http://localhost:19006"], // update with your frontend origins
       methods: ["GET", "POST"],
       credentials: true,
     },
