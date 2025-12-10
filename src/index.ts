@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import express from 'express';
+import { Request, Response } from "express";
 import listingRoutes from './routes/listingRoutes';
 import messageRoutes from './routes/messageRoutes';
 import conversationRoutes from './routes/conversationRoutes';
@@ -196,16 +197,20 @@ app.use("/api/payments", paymentRoutes);
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/profiles", express.static(path.join(__dirname, "profiles")));
-app.get("/smtp-test", async (req, res) => {
+app.get("/smtp-test", async (req: Request, res: Response): Promise<void> => {
   try {
     await sendEmails({
       to: "abdulsomed0825@gmail.com",
       subject: "SMTP Test",
       html: "<h1>Working</h1>"
     });
-    res.send("Email sent");
+
+    res.status(200).json({ message: "SMTP is working" });
   } catch (err) {
-    res.json({ error: err.message });
+    const errorMessage =
+      err instanceof Error ? err.message : "Unknown error";
+
+    res.status(500).json({ error: errorMessage });
   }
 });
 
