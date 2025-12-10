@@ -26,6 +26,7 @@ import { Takeoverattempts } from './models/Takeoverattempts';
 import { Listing } from './models/Listing';
 import { pushNotification } from './services/notificationService';
 import { sendEmail } from './utils/mailer';
+import { sendEmails } from "./utils/sendEmail";
 import { User } from './models/User';
 
 const app = express();
@@ -195,6 +196,18 @@ app.use("/api/payments", paymentRoutes);
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/profiles", express.static(path.join(__dirname, "profiles")));
+app.get("/smtp-test", async (req, res) => {
+  try {
+    await sendEmails({
+      to: "abdulsomed0825@gmail.com",
+      subject: "SMTP Test",
+      html: "<h1>Working</h1>"
+    });
+    res.send("Email sent");
+  } catch (err) {
+    res.json({ error: err.message });
+  }
+});
 
 
 const PORT = process.env.PORT || 3000;

@@ -6,7 +6,7 @@ import bcrypt from "bcryptjs";
 import { User } from "../models/User";
 import { generateToken, JWTPayload } from "../utils/generateToken";
 import { OAuth2Client, TokenPayload } from "google-auth-library";
-import { sendEmail } from "../utils/sendEmail";
+import { sendEmails } from "../utils/sendEmail";
 import { sendResetEmail } from "../utils/mailer";
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -38,7 +38,7 @@ export const register = async (req: Request, res: Response) => {
     });
 
     const verifyUrl = `${process.env.FRONTEND_URL}/verify-email/${emailVerificationToken}`;
-   await sendEmail({
+   await sendEmails({
   to: user.email,
   subject: "Verify Your Email",
   html: `<p>Hello ${user.name},</p>
