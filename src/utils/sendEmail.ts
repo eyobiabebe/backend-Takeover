@@ -9,11 +9,11 @@ interface EmailOptions {
 export const sendEmails = async ({ to, subject, html }: EmailOptions) => {
   try {
     const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST 
+      host: process.env.SMTP_HOST,
       port: Number(process.env.SMTP_PORT),
       secure: false, 
       auth: {
-        user: process.env.SMTP_USER 
+        user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
       },
       tls: {
