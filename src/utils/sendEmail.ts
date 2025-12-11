@@ -9,12 +9,12 @@ interface EmailOptions {
 export const sendEmails = async ({ to, subject, html }: EmailOptions) => {
   try {
     const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT),
+      host: process.env.SMTP_HOST ||"smtp.office365.com",
+      port: Number(process.env.SMTP_PORT) || 587,
       secure: false, // true for 465, false for other ports
       auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
+        user: process.env.SMTP_USER || "takeover@takeovermobile.com",
+        pass: process.env.SMTP_PASS|| "Wunnatakeover",
       },
       tls: {
         rejectUnauthorized: false,
@@ -22,7 +22,7 @@ export const sendEmails = async ({ to, subject, html }: EmailOptions) => {
     });
 
     await transporter.sendMail({
-      from: process.env.SMTP_USER,
+      from: process.env.SMTP_USER || "takeover@takeovermobile.com",
       to,
       subject,
       html,
