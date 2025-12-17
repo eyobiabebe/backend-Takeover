@@ -8,7 +8,7 @@ interface EmailOptions {
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY as string);
 
-export const sendEmail = async ({ to, subject, html }: EmailOptions) => {
+export const sendEmails = async ({ to, subject, html }: EmailOptions) => {
   try {
     await sgMail.send({
       to,
