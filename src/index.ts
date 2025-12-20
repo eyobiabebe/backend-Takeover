@@ -32,6 +32,55 @@ import { User } from './models/User';
 
 const app = express();
 
+app.set("trust proxy", 1);
+
+app.use(cookieParser());
+app.use(passport.initialize());
+
+app.use(cors({
+  origin: [ process.env.FRONTEND_URL as string, 'https://www.takeovermobile.com', 'https://website-takeover.onrender.com', 'http://192.168.1.2:5173', 'http://localhost:8081', 'http://localhost:19006', 'http://192.168.1.2:19000', 'https://www.takeovermobile.com/'], // React Vite frontend
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE","PATCH"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
+
+app.use(express.json());
+
+app.get('/', (req, res) => {
+  res.send('API is working 🚀');
+});
+
+
+//routes
+app.use('/api/listings', listingRoutes);
+app.use('/api/messages', messageRoutes); // Assuming you have messageRoutes defined similarly to listingRoute
+app.use('/api/conversations', conversationRoutes);
+app.use('/api/profile', profileRoutes);
+app.use('/api/takeover', takeoverattempts);
+app.use("/api/notifications", notificationRoutes);
+app.use("/api/favorites", favoriteRoutes);
+app.use("/api/users", authRoutes);
+app.use("/api/payments", paymentRoutes);
+
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/profiles", express.static(path.join(__dirname, "profiles")));
+app.get("/smtp-test", async (req: Request, res: Response): Promise<void> => {
+  try {
+    await sendEmails({
+      to: "abdulsomed0825@gmail.com",
+      subject: "SMTP Test",
+      html: "<h1>Working</h1>"
+    });
+
+    res.status(200).json({ message: "SMTP is working" });
+  } catch (err) {
+    const errorMessage =
+      err instanceof Error ? err.message : "Unknown error";
+
+    res.status(500).json({ error: errorMessage });
+  }
+});
+
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
   apiVersion: '2025-09-30.clover',
 });
@@ -168,51 +217,6 @@ app.post(
   }
 );
 
-// ✅ parse cookies
-app.use(cookieParser());
-app.use(passport.initialize());
-
-app.use(cors({
-  origin: [ process.env.FRONTEND_URL as string,  'https://website-takeover.onrender.com', 'http://192.168.1.2:5173', 'http://localhost:8081', 'http://localhost:19006', 'http://192.168.1.2:19000', 'https://www.takeovermobile.com/'], // React Vite frontend
-  credentials: true,
-}));
-
-app.use(express.json());
-
-app.get('/', (req, res) => {
-  res.send('API is working 🚀');
-});
-
-
-//routes
-app.use('/api/listings', listingRoutes);
-app.use('/api/messages', messageRoutes); // Assuming you have messageRoutes defined similarly to listingRoute
-app.use('/api/conversations', conversationRoutes);
-app.use('/api/profile', profileRoutes);
-app.use('/api/takeover', takeoverattempts);
-app.use("/api/notifications", notificationRoutes);
-app.use("/api/favorites", favoriteRoutes);
-app.use("/api/users", authRoutes);
-app.use("/api/payments", paymentRoutes);
-
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-app.use("/profiles", express.static(path.join(__dirname, "profiles")));
-app.get("/smtp-test", async (req: Request, res: Response): Promise<void> => {
-  try {
-    await sendEmails({
-      to: "abdulsomed0825@gmail.com",
-      subject: "SMTP Test",
-      html: "<h1>Working</h1>"
-    });
-
-    res.status(200).json({ message: "SMTP is working" });
-  } catch (err) {
-    const errorMessage =
-      err instanceof Error ? err.message : "Unknown error";
-
-    res.status(500).json({ error: errorMessage });
-  }
-});
 
 
 const PORT = process.env.PORT || 3000;

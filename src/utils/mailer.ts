@@ -1,21 +1,36 @@
 // backend/utils/mailer.ts
-import nodemailer from "nodemailer";
+import sgMail from "@sendgrid/mail";
 import PDFDocument from "pdfkit";
 import fs from "fs";
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT), 
-  secure: false,
-  auth: {
-    user: process.env.SMTP_USER, // full email: info@yourdomain.com
-    pass: process.env.SMTP_PASS, // email password
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY as string);
+
+const transporter = {
+  sendMail: async (mailOptions: any) => {
+    await sgMail.send({
+      to: mailOptions.to,
+      from: process.env.EMAIL_FROM as string,
+      subject: mailOptions.subject,
+      html: mailOptions.html,
+      attachments: mailOptions.attachments?.map((att: any) => ({
+        filename: att.filename,
+        content: att.path
+          ? fs.readFileSync(att.path).toString("base64")
+          : att.content,
+        type: "application/pdf",
+        disposition: "attachment",
+      })),
+      trackingSettings: {
+        clickTracking: { enable: false, enableText: false },
+      },
+    });
   },
-});
+};
 
 export const sendResetEmail = async (to: string, resetUrl: string) => {
   const mailOptions = {
-    from: process.env.SMTP_USER ,
+    from: process.env.EMAIL_FROM ,
     to,
     subject: "Password Reset Request",
     html: `
@@ -35,7 +50,7 @@ export const sendEmail = async (to: string, type: string, data: Record<string, a
   if (type === "draft_listing") {
 
     const mailOptions = {
-      from: process.env.SMTP_USER,
+      from: process.env.EMAIL_FROM,
       to,
       subject: "Your Lease Draft is Saved — Complete Payment to Publish",
       html: `
@@ -129,7 +144,7 @@ export const sendEmail = async (to: string, type: string, data: Record<string, a
 
   } else if (type === "publish_listing") {
     const mailOptions = {
-      from: process.env.SMTP_USER,
+      from: process.env.EMAIL_FROM,
       to,
       subject: "🎉 Your Lease Has Been Published Successfully!",
       html: `
@@ -227,7 +242,7 @@ export const sendEmail = async (to: string, type: string, data: Record<string, a
 
   } else if (type === "proceed_takeoverer") {
     const mailOptions = {
-      from: process.env.SMTP_USER,
+      from: process.env.EMAIL_FROM,
       to,
       subject: "🎉 Takeover proceeded Successfully!",
       html: `
@@ -322,7 +337,7 @@ export const sendEmail = async (to: string, type: string, data: Record<string, a
   } else if (type === "proceed_tenant") {
     const mailOptions = {
 
-      from: process.env.SMTP_USER,
+      from: process.env.EMAIL_FROM,
       to,
       subject: "🎉 Takeover proceeded Successfully!",
       html: `
@@ -411,6 +426,7 @@ export const sendEmail = async (to: string, type: string, data: Record<string, a
     };
 
     await transporter.sendMail(mailOptions);
+    
 
   } else if (type === "accepted_tenant") {
 
@@ -482,7 +498,7 @@ export const sendEmail = async (to: string, type: string, data: Record<string, a
 
     const mailOptions = {
 
-      from: process.env.SMTP_USER,
+      from: process.env.EMAIL_FROM,
       to,
       subject: "🎉 Takeover Accepted Successfully!",
       html: `
@@ -578,6 +594,7 @@ export const sendEmail = async (to: string, type: string, data: Record<string, a
     };
 
     await transporter.sendMail(mailOptions);
+    fs.unlinkSync(pdfPath);
   } else if (type === "accepted_landlord") {
 
     if(!to){
@@ -644,7 +661,7 @@ export const sendEmail = async (to: string, type: string, data: Record<string, a
     await new Promise((resolve) => writeStream.on("finish", resolve as any));
 
     const mailOptions = {
-      from: process.env.SMTP_USER,
+      from: process.env.EMAIL_FROM,
       to,
       subject: "🎉 Takeover Accepted Successfully!",
       html: `
@@ -740,6 +757,7 @@ export const sendEmail = async (to: string, type: string, data: Record<string, a
     };
 
     await transporter.sendMail(mailOptions);
+    fs.unlinkSync(pdfPath);
   } else if (type === "accepted_takeoverer") {
     // Step 1: Create PDF
     const pdfPath = `./tmp/Takeover_Lease_Transfer_${Date.now()}.pdf`;
@@ -802,7 +820,7 @@ export const sendEmail = async (to: string, type: string, data: Record<string, a
 
     const mailOptions = {
 
-      from: process.env.SMTP_USER,
+      from: process.env.EMAIL_FROM,
       to,
       subject: "🎉 Takeover Accepted Successfully!",
       html: `
@@ -898,6 +916,7 @@ export const sendEmail = async (to: string, type: string, data: Record<string, a
     };
 
     await transporter.sendMail(mailOptions);
+    fs.unlinkSync(pdfPath);
   }
 
 };

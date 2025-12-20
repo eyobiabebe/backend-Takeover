@@ -221,6 +221,7 @@ export const login = async (req: Request, res: Response) => {
       httpOnly: true,
       secure: true,//change to true in production
       sameSite: "none",
+      domain: ".takeovermobile.com",
       maxAge: rememberMe ? 7 * 24 * 60 * 60 * 1000 : undefined,
     });
 
@@ -239,7 +240,7 @@ export const login = async (req: Request, res: Response) => {
 // ================= LOGOUT =================
 export const logout = async (_req: Request, res: Response) => {
   try {
-    res.clearCookie("token", { httpOnly: true, secure: false, sameSite: "strict" });
+    res.clearCookie("token", { httpOnly: true, secure: true, sameSite: "none" });
     return res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
     console.error("logout error:", error);
@@ -277,7 +278,7 @@ export const googleMobileLogin = async (req: Request, res: Response) => {
     }
 
     const jwtToken = generateToken({ id: user.id, email: user.email }, "7d");
-    res.cookie("token", jwtToken, { httpOnly: true, secure: true, sameSite: "none", maxAge: 24 * 60 * 60 * 1000 });
+    res.cookie("token", jwtToken, { httpOnly: true, secure: true, sameSite: "none", domain: ".takeovermobile.com", maxAge: 24 * 60 * 60 * 1000 });
 
     return res.json({
       token: jwtToken,
