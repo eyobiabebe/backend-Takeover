@@ -176,7 +176,7 @@ app.use(cookieParser());
 app.use(passport.initialize());
 
 app.use(cors({
-  origin: [ process.env.FRONTEND_URL as string, 'https://website-takeover.onrender.com', 'http://192.168.1.2:5173', 'http://localhost:8081', 'http://localhost:19006', 'http://192.168.1.2:19000', 'https://www.takeovermobile.com/'], // React Vite frontend
+  origin: [ process.env.FRONTEND_URL as string ], // React Vite frontend
   credentials: true,
 }));
 
