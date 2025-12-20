@@ -110,14 +110,14 @@ export const acceptListing = async (req: Request, res: Response) => {
 
     if (!takeover) return res.status(404).json({ error: "Takeover not found" });
 
-    // takeover.status = "accepted";
-    // await takeover.save();
+    takeover.status = "accepted";
+    await takeover.save();
 
     // Reject other takeovers for the same listing
-    // await Takeoverattempts.update(
-    //   { status: "rejected" },
-    //   { where: { listingId: takeover.listingId, id: { [Op.ne]: takeover.id } } }
-    // );
+    await Takeoverattempts.update(
+      { status: "rejected" },
+      { where: { listingId: takeover.listingId, id: { [Op.ne]: takeover.id } } }
+    );
 
     const listing = await Listing.findByPk(takeover.listingId);
 
