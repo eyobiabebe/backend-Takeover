@@ -221,7 +221,8 @@ export const login = async (req: Request, res: Response) => {
       httpOnly: true,
       secure: true,//change to true in production
       sameSite: "none",
-      maxAge: rememberMe ? 7 * 24 * 60 * 60 * 1000 : undefined,
+      maxAge: rememberMe ? 7 * 24 * 60 * 60 * 1000 : 7 * 24 * 60 * 1000,
+      domain: "https://www.takeovermobile.com"
     });
 
     return res.status(200).json({

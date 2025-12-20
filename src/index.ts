@@ -183,7 +183,7 @@ app.get('/', (req, res) => {
   res.send('API is working 🚀');
 });
 
-
+app.set("trust proxy", 1);
 //routes
 app.use('/api/listings', listingRoutes);
 app.use('/api/messages', messageRoutes); // Assuming you have messageRoutes defined similarly to listingRoute
