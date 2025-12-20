@@ -221,7 +221,7 @@ export const login = async (req: Request, res: Response) => {
       httpOnly: true,
       secure: true,//change to true in production
       sameSite: "none",
-      domain: ".takeovermobile.com",
+      domain: "https://www.takeovermobile.com",
       maxAge: rememberMe ? 7 * 24 * 60 * 60 * 1000 : undefined,
     });
 
@@ -278,7 +278,7 @@ export const googleMobileLogin = async (req: Request, res: Response) => {
     }
 
     const jwtToken = generateToken({ id: user.id, email: user.email }, "7d");
-    res.cookie("token", jwtToken, { httpOnly: true, secure: true, sameSite: "none", domain: ".takeovermobile.com", maxAge: 24 * 60 * 60 * 1000 });
+    res.cookie("token", jwtToken, { httpOnly: true, secure: true, sameSite: "none", domain: "https://www.takeovermobile.com", maxAge: 24 * 60 * 60 * 1000 });
 
     return res.json({
       token: jwtToken,
