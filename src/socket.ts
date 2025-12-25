@@ -4,6 +4,7 @@ import { Server, Socket } from "socket.io";
 import { Message } from "./models/Message";
 import { User } from "./models/User";
 import { Conversation } from "./models/Conversation";
+import jwt from "jsonwebtoken";
 
 let io: Server | undefined;
 
@@ -73,6 +74,34 @@ export const initSocket = (server: HttpServer) => {
 
   return io;
 };
+
+io.use((socket, next) => {
+  // 1️⃣ Try cookie first (BEST – works with withCredentials)
+  const cookieHeader = socket.handshake.headers.cookie;
+  let token: string | undefined;
+
+  if (cookieHeader) {
+    const match = cookieHeader.match(/token=([^;]+)/);
+    if (match) token = match[1];
+  }
+
+  // 2️⃣ Fallback to auth.token (mobile / localStorage)
+  if (!token) {
+    token = socket.handshake.auth?.token;
+  }
+
+  if (!token) {
+    return next(new Error("Not authenticated"));
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+    socket.data.user = decoded; // ✅ SAME AS req.user
+    next();
+  } catch {
+    return next(new Error("Invalid token"));
+  }
+});
 
 // Optional helper to emit programmatically from controllers/services
 export const emitMessage = (conversationId: number | string, message: any) => {
